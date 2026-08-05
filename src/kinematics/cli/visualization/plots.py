@@ -238,8 +238,10 @@ def create_four_view_plot(
             view_name == "iso",
         )
 
-    # Add legend only to isometric view.
-    axes["iso"].legend(loc="upper left")
+    # Add legend only to isometric view, placed outside the axes so it
+    # doesn't cover the drawn geometry. bbox_inches="tight" on save below
+    # expands the saved figure to include it.
+    axes["iso"].legend(loc="upper left", bbox_to_anchor=(1.05, 1.0), fontsize=8)
 
     # Set main title and layout.
     fig.suptitle(title, fontsize=16)

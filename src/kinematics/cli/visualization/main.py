@@ -33,16 +33,16 @@ class LinkStyle:
 
 
 ELEMENT_STYLES = {
-    ElementType.WISHBONE: LinkStyle("dodgerblue"),
-    ElementType.TRACK_ROD: LinkStyle("darkorange"),
+    ElementType.WISHBONE: LinkStyle("red"),
+    ElementType.TRACK_ROD: LinkStyle("dodgerblue"),
     ElementType.TOE_LINK: LinkStyle("darkorange"),
-    ElementType.AXLE: LinkStyle("forestgreen"),
+    ElementType.AXLE: LinkStyle("orange"),
     ElementType.PUSHROD: LinkStyle("crimson"),
     ElementType.DROPLINK: LinkStyle("goldenrod"),
     ElementType.SPRING_DAMPER: LinkStyle("seagreen"),
     ElementType.HEAVE_LINK: LinkStyle("darkmagenta", linestyle="--"),
     ElementType.RACK: LinkStyle("purple"),
-    ElementType.UPRIGHT: LinkStyle("slategrey"),
+    ElementType.UPRIGHT: LinkStyle("forestgreen"),
     ElementType.ROCKER: LinkStyle("mediumvioletred"),
     ElementType.ANTI_ROLL_BAR: LinkStyle("teal"),
     ElementType.TORSION_BAR: LinkStyle("teal"),
@@ -79,6 +79,18 @@ class LinkVisualization:
         return self.legend_label
 
 
+def _unmirrored_label(label: str) -> str:
+    """
+    Drop a "Left "/"Right " side qualifier so mirrored corners share one
+    legend entry - the two sides are reflections of each other, not
+    distinct parts.
+    """
+    for prefix in ("Left ", "Right "):
+        if label.startswith(prefix):
+            return label[len(prefix):]
+    return label
+
+
 def renderer_elements(
     elements: Sequence[NamedElementPath],
 ) -> tuple[LinkVisualization, ...]:
@@ -88,8 +100,9 @@ def renderer_elements(
     rendered: list[LinkVisualization] = []
     labels: set[str] = set()
     for element in elements:
-        legend_label = element.label if element.label not in labels else "_nolegend_"
-        labels.add(element.label)
+        display_label = _unmirrored_label(element.label)
+        legend_label = display_label if display_label not in labels else "_nolegend_"
+        labels.add(display_label)
         rendered.append(
             LinkVisualization(
                 element=element,
